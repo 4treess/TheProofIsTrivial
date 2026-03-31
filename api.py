@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import project
+import proof as tc
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,17 +26,27 @@ async def get_proof(proposition: str):
     return db.retrieveProof({"proposition": proposition})
 
 @app.get("/Proofs/{username}")
-async def get_proofByCreator(username: str):
+async def get_proof_by_creator(username: str):
     return db.retrieveProofs({"username": username})
 
-@app.post("/User")
+@app.get("/Login/{username}")
+async def login_to_website(username: str):
+    return db.getUser({"username": username})
+
+@app.post("/AddUser")
 async def add_user(user: User):
     return db.addUser(user.dict())
 
 @app.post("/Proof")
 async def add_proof(proof: Proof):
-    # Note To Thomas or Future Trevor: Update result here with an ACTUAL Proof, otherwise the math profs will hate you
-    proof.result = "Its so trivial that it doesn't even need to be mentioned"
+    prop1 = proof.proposition
+    try:
+        p1 = tc.Proof(prop1)
+    except tc.PropositionError as e:
+        print(e)
+        return False
+
+    proof.result = p1.getProof()
     return db.addProof(proof.dict())
 
 @app.post("/DelUser")

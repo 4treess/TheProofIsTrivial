@@ -98,3 +98,7 @@ class Database:
     def deleteProof(self, input):
         query = "DELETE FROM Proofs WHERE proposition = %(proposition)s;"
         return self._update(query, input)
+    
+    def getUser(self, input):
+        query = "SELECT COUNT(*) as Count FROM Users WHERE username = %(username)s;"
+        return self._retrieve(query, input)
