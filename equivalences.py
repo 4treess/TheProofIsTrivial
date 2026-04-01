@@ -8,10 +8,10 @@
 #        given variables ie 
 #               if a|b => b = ac for some integer c
 #               then the equivalance class of b = B = {b, ac}
-from __future__ import annotations
+# THIS FILE IS COMPLETELY UNUSED AT THIS POINT
+# IT IS ONLY BEING LEFT BEHIND FOR REFERENCE
 from collections import UserList, UserDict
 from copy import deepcopy
-
 
 class EquivalenceClass(UserDict):
 

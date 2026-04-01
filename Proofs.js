@@ -33,7 +33,7 @@ function GetProof({ username, setStatus }) {
                 </label>
             </form> 
             {proofs.map((item, i) => (
-                <p key={i}><strong>Claim:</strong> {item.proposition}<br/><strong>Proof:</strong> {item.result}</p>
+                <pre key={i}><strong>Claim:</strong> {item.proposition}<br/><strong>Proof:</strong> {item.result}</pre>
             ))}
         </div>
     );
@@ -54,7 +54,7 @@ function GetProofs({ username, setStatus}) {
         <div>
             <button onClick={fetchAll}>Click To Retrieve Your Proofs</button>
             {proofs.map((item, i) => (
-                <p key={i}>{item.creator}'s Proof #{i + 1}: <br/>Claim: {item.proposition} <br/>Proof: {item.result}<br/><a href="#" onClick={(e) => {e.preventDefault; DelProof(item.proposition, item.creator)}}>Delete Proof #{i + 1}</a><br/></p>
+                <pre key={i}>{item.creator}'s Proof #{i + 1}: <br/>Claim: {item.proposition} <br/>Proof: {item.result} <br/><a href="#" onClick={(e) => {e.preventDefault; DelProof(item.proposition, item.creator)}}>Delete Proof #{i + 1}</a><br/></pre>
             ))}
         </div>
     );

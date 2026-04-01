@@ -47,6 +47,11 @@ async def add_proof(proof: Proof):
         return False
 
     proof.result = p1.getProof()
+    # lists = proof.result.split("\n")
+    # proof.result = ""
+    # for i in lists:
+    #     proof.result += i + "<br/>"
+            
     return db.addProof(proof.dict())
 
 @app.post("/DelUser")

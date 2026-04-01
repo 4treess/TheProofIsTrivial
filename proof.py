@@ -8,7 +8,7 @@ import re
 
 #Customs imports
 from propositiontree import PropositionTreeNode, PropositionTree
-from equivalences import World, EquivalenceClass
+from proofgraph import ProofNode, ProofGraph
 import symbols as sym
 
 class PropositionError(Exception):
@@ -26,14 +26,17 @@ class Proof:
         self.validateProp()
         self.proposition = Proof.fromInfixToPostfix(Proof.implicitToExplicitMul(self.infixProp))
         self.pTree = PropositionTree(self.proposition)
-        result = {'Proposition': str, 'Proof': '', 'Disproof': ''}
+        self.trees = [PropositionTree(self.fromInfixToPostfix(PropositionTree.inOrder(p, ''))) for p in self.pTree.trees]
+        self.graphs = [ProofGraph(t) for t in self.trees]
+        self.proof = self.getProof()
+
 
     def validateProp(self) -> bool:
 
         format = r'[A-Za-z0-9' + sym.validOps + r']+' + r'[' + sym.validIfs + r'][A-Za-z0-9' + sym.validOps + r']+'
         for char in self.infixProp:
             if not char.isalnum() and char not in sym.precedence.keys() and char != sym._lbr and char != sym._rbr:
-                raise PropositionError('Invalid operator ' + char + ' found in proposition ' + prop + '.')
+                raise PropositionError('Invalid operator ' + char + ' found in proposition ' + self.infixProp + '.')
         if not re.match(format, self.infixProp):
             raise PropositionError('Invalid proposition format. Expected if(f) P then Q.')
 
@@ -124,20 +127,22 @@ class Proof:
 
     def getProof(self) -> str:
 
-        # populates result portion of proof
-        proof = ''
-        proof += self.pTree.graph.traverseProof()
+        for g in self.graphs:
+            g.discoverFacts()
+        output = ''
+        if len(self.graphs) > 1:
+            output += f'Suppose {self.infixProp.split(sym._if)[0]}'
+            for case, g in enumerate(self.graphs):
+                #print(f'case {case + 1}: \n{g}')
+                
+                output += f'\nCase {case + 1}: Suppose {g.traverseProof()}\n'
 
-        return proof
+            output += f'We see that in all cases, {self.infixProp.split(sym._if)[1]} ∎\n'
+        else:
+            #print(g)
+            output += f'Suppose {g.traverseProof()} ∎\n'
 
-    def getKnown(self) -> World:
-        return self.pTree.known
-
-    def getWant(self) -> World:
-        return self.pTree.want
-
-    def getSource(self) -> dict:
-        return self.pTree.source
+        return output
 
     def getOperands(self) -> list:
         return sorted(self.pTree.operands)
@@ -156,18 +161,4 @@ class Proof:
     def combineKnown(self) -> None:
         self.pTree.combineKnown()
 
-if __name__ == '__main__':
 
-    prop1 = 'a|b&&b|c=>a|c'
-    try:
-        p1 = Proof(prop1)
-    except PropositionError as e:
-        print(e)
-        exit(1)
-
-
-    print(p1.proposition)
-
-    print('k:', p1.getKnown())
-    print('w:', p1.getWant())
-    print('s: ', p1.pTree.source)
