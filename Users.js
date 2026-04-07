@@ -1,8 +1,10 @@
-function AddUser({ setStatus }) {
+function AddUser() {
     const [user, setUser] = React.useState("");
+    const [feedback, setFeedback] = React.useState("");
 
     async function sendUserDataToPython(e) {
         e.preventDefault();
+        if (!user.trim()) return;
         try {
             const response = await fetch('http://localhost:8000/AddUser', {
                 method: "POST", 
@@ -10,18 +12,23 @@ function AddUser({ setStatus }) {
                 body: JSON.stringify({"username": user})
             });
             const success = await response.json();
-            setStatus(success ? "Successfully Added User!" : "Error Adding User!");
+            setFeedback(success ? "User created! You can now login." : "Username already exists.");
         } catch (error) {
-            setStatus("Server Error");
+            setFeedback("Server Connection Error");
         }
     }
 
     return (
-        <form onSubmit={sendUserDataToPython}>
-            <label> Enter Your Username:
-                <input type="text" value={user} onChange={(e) => setUser(e.target.value)}/>
-            </label>
-            <button type="submit">Add</button>
+        <form onSubmit={sendUserDataToPython} className="auth-form">
+            <input 
+                type="text" 
+                placeholder="Choose a username"
+                value={user} 
+                onChange={(e) => setUser(e.target.value)}
+                className="math-input"
+            />
+            <button type="submit" className="secondary-btn">Create Account</button>
+            {feedback && <p className="status-msg">{feedback}</p>}
         </form>
     );
 }

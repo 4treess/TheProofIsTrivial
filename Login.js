@@ -1,35 +1,35 @@
 function Login({ onLoginSuccess }) {
     const [user, setUser] = React.useState(""); 
-    const [status, setStatus] = React.useState("");
+    const [feedback, setFeedback] = React.useState("");
 
     async function getWebData(e) {
         e.preventDefault();
         try {
             const response = await fetch(`http://localhost:8000/Login/${user}`);
             if (response.ok) {
-                const tempData = await response.json();
-                if (tempData && tempData[0]?.Count > 0) {
-                    setStatus("Successfully Logged In!");
-                    onLoginSuccess(user, status); 
+                const data = await response.json();
+                if (data && data[0]?.Count > 0) {
+                    onLoginSuccess(user); 
                 } else {
-                    setStatus("Invalid Username");
+                    setFeedback("Invalid Username! If you havent logged in before, please sign up!");
                 }
             }
         } catch (error) {
-            console.error("Connection error:", error);
-            setStatus("Server Error");
+            setFeedback("The server is currently experiencing non-trivial problems.");
         }
     }
 
     return (
-        <div>
-            <form onSubmit={getWebData}>
-                <label> Enter Your username to access the website:
-                    <input type="text" value={user} onChange={(e) => setUser(e.target.value)} />
-                </label>
-                <button type="submit">Login</button>
-            </form>
-            <p>{status}</p>
-        </div>
+        <form onSubmit={getWebData} className="auth-form">
+            <input 
+                type="text" 
+                placeholder="Enter username"
+                value={user} 
+                onChange={(e) => setUser(e.target.value)} 
+                className="math-input"
+            />
+            <button type="submit" id="generateBtn" style={{ width: '100%' }}>Login</button>
+            {feedback && <p className="status-msg" style={{ color: '#ef4444' }}>{feedback}</p>}
+        </form>
     );
 }

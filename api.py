@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import project
+import google.api_core
+import google.genai as genai
 import proof as tc
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,11 +44,13 @@ async def add_proof(proof: Proof):
     prop1 = proof.proposition
     try:
         p1 = tc.Proof(prop1)
+        proof.result = p1.getProof()
     except tc.PropositionError as e:
         print(e)
-        return False
+        client = genai.Client()
+        response = client.models.generate_content(model="gemini-3-flash-preview", contents='Please prove this following proof that I will provide to you in a formal mathematical proof notation. Do not repeat the proposition in the response! Do not say anything that isnt part of the mathematical proof and end the proof with a black box. Do not split the proof into a numbered list, you may split the proof into multiple cases or multiple paragraphs, but dont start a random numbered list in the middle of the proof. If you are using a specific proof technique please just state which one you are using ex: Proof (Contradiction) or Disproof (Counterexample) and please adhere to the format of that proof technique. If the provided proposition is false, provide a disproof of it. If the proposition is complete nonsense, ie it is not a mathematical statement at all, then please just say "The proof is so trivial It doesn`t even need to be explained" The proposition you have to prove is:' + proof.proposition)
+        proof.result = response.text
 
-    proof.result = p1.getProof()
     # lists = proof.result.split("\n")
     # proof.result = ""
     # for i in lists:
