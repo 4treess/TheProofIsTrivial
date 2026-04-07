@@ -1,0 +1,30 @@
+import proof as tc
+
+if __name__ == '__main__':
+
+    prop1 = 'a|c⋀(b|d⋁b|e)→ab|cde'
+    try:
+        p1 = tc.Proof(prop1)
+    except tc.PropositionError as e:
+        print(e)
+        exit(1)
+
+
+    prop2 = 'a|b&&b|c=>a|c'
+    try:
+        p2 = tc.Proof(prop2)
+    except tc.PropositionError as e:
+        print(e)
+        exit(1)
+
+
+    prop3 = 'a|b||a|c=>a|bc'
+    try:
+        p3 = tc.Proof(prop3)
+    except tc.PropositionError as e:
+        print(e)
+        exit(1)
+
+    proofs = [p1,p2,p3]
+    for p in proofs:
+        print(p.getProof())
